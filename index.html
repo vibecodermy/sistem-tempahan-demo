@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempah Slot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2430; --muted:#5B6573; --line:#E2E6E4; --bg:#F6F7F6; --card:#FFFFFF;
+    --teal:#0F766E; --teal-soft:#E3F1EF; --gold:#F2B01E; --danger:#B42318;
+    --font:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px 40px}
+
+  header{padding:28px 0 18px}
+  header small{display:block;font-size:.8rem;font-weight:600;color:var(--teal);letter-spacing:.04em;text-transform:uppercase}
+  header h1{margin:4px 0 0;font-size:1.6rem;line-height:1.2;font-weight:800}
+
+  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin-bottom:12px}
+  .step h2{margin:0 0 12px;font-size:1rem;font-weight:800;display:flex;align-items:center;gap:10px}
+  .step h2 span{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font-size:.78rem;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .step.off{opacity:.45;pointer-events:none}
+
+  /* Servis */
+  .services{display:grid;gap:8px}
+  .svc{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;font:inherit;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer}
+  .svc b{font-weight:600}
+  .svc em{font-style:normal;color:var(--muted);font-size:.92rem}
+  .svc[aria-pressed="true"]{border-color:var(--teal);background:var(--teal-soft)}
+  .svc[aria-pressed="true"] em{color:var(--teal);font-weight:600}
+
+  /* Tarikh */
+  .days{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .day{flex:0 0 62px;scroll-snap-align:start;font:inherit;text-align:center;padding:8px 0;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer;line-height:1.25}
+  .day small{display:block;font-size:.72rem;color:var(--muted)}
+  .day strong{display:block;font-size:1.25rem;font-weight:800}
+  .day[aria-pressed="true"]{border-color:var(--teal);background:var(--teal);color:#fff}
+  .day[aria-pressed="true"] small{color:#D6EFEB}
+  .day:disabled{background:#F1F3F2;color:#A9B1AE;cursor:not-allowed}
+  .day:disabled small{color:#A9B1AE}
+
+  /* Slot */
+  .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .slot{font:inherit;font-weight:600;font-size:.92rem;padding:10px 0;border-radius:10px;border:0;background:var(--teal-soft);color:var(--teal);cursor:pointer}
+  .slot[aria-pressed="true"]{background:var(--teal);color:#fff}
+  .slot:disabled{background:#F1F3F2;color:#A9B1AE;text-decoration:line-through;font-weight:400;cursor:not-allowed}
+  .hint{margin:0;color:var(--muted);font-size:.92rem}
+
+  /* Borang */
+  label{display:block;font-weight:600;font-size:.9rem;margin:0 0 6px}
+  label small{font-weight:400;color:var(--muted)}
+  input,textarea{width:100%;font:inherit;padding:12px 13px;border:1.5px solid #C9D0CD;border-radius:10px;background:#fff;color:var(--ink);margin-bottom:14px}
+  textarea{resize:vertical;min-height:70px}
+  input:focus,textarea:focus{outline:3px solid rgba(15,118,110,.25);border-color:var(--teal)}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+  .summary{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:.92rem;margin-bottom:14px}
+  .summary b{font-weight:600}
+
+  .btn{display:block;width:100%;text-align:center;text-decoration:none;font:inherit;font-weight:800;font-size:1.05rem;padding:15px;border:0;border-radius:12px;background:var(--ink);color:#fff;cursor:pointer}
+  .btn:disabled{opacity:.6;cursor:wait}
+  .btn.wa{background:#1FA855;margin-top:10px}
+  .btn:focus-visible,.svc:focus-visible,.day:focus-visible,.slot:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+  .err{display:none;color:var(--danger);background:#FDEDEC;border-radius:10px;padding:10px 12px;font-size:.92rem;margin-bottom:12px}
+  .err.show{display:block}
+
+  /* Berjaya */
+  .done{display:none;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 18px}
+  .done .tick{width:60px;height:60px;border-radius:50%;background:#DCFCE7;color:#15803D;font-size:1.8rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+  .done h2{margin:0 0 6px;font-size:1.35rem}
+  .done p{margin:0 0 16px;color:var(--muted)}
+  .done .summary{text-align:left}
+
+  .loading{color:var(--muted);font-size:.92rem}
+  footer{text-align:center;color:var(--muted);font-size:.78rem;padding-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <small>Tempahan dalam talian</small>
+    <h1 id="kedai">Memuatkan…</h1>
+  </header>
+
+  <div class="err" id="err" role="alert"></div>
+
+  <div id="flow">
+    <section class="step" id="s1" aria-labelledby="h1s">
+      <h2 id="h1s"><span>1</span>Pilih servis</h2>
+      <div class="services" id="services"><p class="loading">Memuatkan servis…</p></div>
+    </section>
+
+    <section class="step off" id="s2" aria-labelledby="h2s">
+      <h2 id="h2s"><span>2</span>Pilih tarikh</h2>
+      <div class="days" id="days"></div>
+    </section>
+
+    <section class="step off" id="s3" aria-labelledby="h3s">
+      <h2 id="h3s"><span>3</span>Pilih masa</h2>
+      <div id="slotBox"><p class="hint">Pilih tarikh dahulu.</p></div>
+    </section>
+
+    <section class="step off" id="s4" aria-labelledby="h4s">
+      <h2 id="h4s"><span>4</span>Maklumat anda</h2>
+      <div class="summary" id="summary"></div>
+      <form id="form" novalidate>
+        <label for="nama">Nama</label>
+        <input id="nama" autocomplete="name" maxlength="60" required>
+        <label for="telefon">No. telefon (WhatsApp)</label>
+        <input id="telefon" type="tel" inputmode="tel" autocomplete="tel" placeholder="012-345 6789" maxlength="20" required>
+        <label for="nota">Nota <small>(pilihan)</small></label>
+        <textarea id="nota" maxlength="200" placeholder="Contoh: nak potong pendek"></textarea>
+        <div class="hp" aria-hidden="true"><input id="website" tabindex="-1" autocomplete="off"></div>
+        <button class="btn" id="btn" type="submit">Sahkan tempahan</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="done" id="done" aria-live="polite">
+    <div class="tick" aria-hidden="true">✓</div>
+    <h2>Tempahan diterima!</h2>
+    <p>Simpan maklumat ini. Kedai akan menghubungi anda jika ada perubahan.</p>
+    <div class="summary" id="doneSummary"></div>
+    <a class="btn wa" id="waBtn" href="#" target="_blank" rel="noopener">WhatsApp kedai</a>
+  </section>
+
+  <footer>Dikuasakan oleh Google Sheets</footer>
+</div>
+
+<script>
+/* ====== TETAPAN ====== */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwRTig5Ey-kJtEqykWcuCtbOt8mRVGMIRr5pSNd3pZoXTcc6n4Lhi-gYl7D1TFYYBSskw/exec"; // URL /exec dari Apps Script
+/* ===================== */
+
+const HARI  = ['Ahd','Isn','Sel','Rab','Kha','Jum','Sab'];
+const HARI_PENUH = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+const BULAN = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+
+const pilih = { servis: null, harga: null, tarikh: null, masa: null };
+let INFO = null;
+
+const $ = id => document.getElementById(id);
+const showErr = m => { $('err').textContent = m; $('err').classList.add('show'); $('err').scrollIntoView({behavior:'smooth', block:'center'}); };
+const hideErr = () => $('err').classList.remove('show');
+const buka = id => $(id).classList.remove('off');
+const tutup = id => $(id).classList.add('off');
+
+function ymd(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function labelTarikh(s){ const d = new Date(s + 'T12:00:00'); return HARI_PENUH[d.getDay()] + ', ' + d.getDate() + ' ' + BULAN[d.getMonth()]; }
+function labelMasa(m){ const [h, mi] = m.split(':').map(Number); const ap = h < 12 ? 'pagi' : (h < 14 ? 'tengah hari' : 'petang'); const h12 = ((h + 11) % 12) + 1; return h12 + ':' + String(mi).padStart(2,'0') + ' ' + ap; }
+
+async function api(params){
+  const r = await fetch(GAS_URL + '?' + new URLSearchParams(params));
+  return r.json();
+}
+
+/* 1. Muat maklumat kedai & servis */
+async function mula(){
+  if (GAS_URL.startsWith('PASTE')) { $('kedai').textContent = 'Sistem belum disambung'; showErr('Tampal URL Apps Script dalam GAS_URL dahulu.'); return; }
+  try {
+    INFO = await api({ action: 'info' });
+    if (!INFO.ok) throw new Error();
+    $('kedai').textContent = INFO.kedai;
+    document.title = 'Tempah Slot | ' + INFO.kedai;
+    lukisServis();
+  } catch(e) {
+    $('kedai').textContent = 'Tak dapat dimuatkan';
+    showErr('Tak dapat sambung ke sistem. Semak internet dan muat semula page.');
+  }
+}
+
+function lukisServis(){
+  const box = $('services'); box.innerHTML = '';
+  INFO.servis.forEach(s => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'svc'; b.setAttribute('aria-pressed','false');
+    b.innerHTML = '<b></b><em></em>';
+    b.querySelector('b').textContent = s.nama;
+    b.querySelector('em').textContent = s.harga ? 'RM' + s.harga : '';
+    b.onclick = () => {
+      box.querySelectorAll('.svc').forEach(x => x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+      pilih.servis = s.nama; pilih.harga = s.harga;
+      buka('s2'); if (!$('days').children.length) lukisTarikh();
+      kemasRingkasan();
+    };
+    box.appendChild(b);
+  });
+}
+
+/* 2. Senarai tarikh (hari cuti dimatikan) */
+function lukisTarikh(){
+  const box = $('days'); box.innerHTML = '';
+  const hariIni = new Date();
+  for (let i = 0; i <= INFO.hariKeDepan; i++) {
+    const d = new Date(hariIni); d.setDate(hariIni.getDate() + i);
+    const s = ymd(d);
+    const cuti = INFO.hariCuti.includes(HARI_PENUH[d.getDay()]);
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'day'; b.setAttribute('aria-pressed','false');
+    b.disabled = cuti;
+    b.innerHTML = '<small>' + (i === 0 ? 'Hari ini' : HARI[d.getDay()]) + '</small><strong>' + d.getDate() + '</strong><small>' + (cuti ? 'Tutup' : BULAN[d.getMonth()]) + '</small>';
+    b.setAttribute('aria-label', labelTarikh(s) + (cuti ? ', kedai tutup' : ''));
+    b.onclick = () => {
+      box.querySelectorAll('.day').forEach(x => x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+      pilih.tarikh = s; pilih.masa = null; kemasRingkasan();
+      tutup('s4'); buka('s3'); muatSlot(s);
+    };
+    box.appendChild(b);
+  }
+}
+
+/* 3. Slot masa untuk tarikh dipilih */
+async function muatSlot(tarikh){
+  hideErr();
+  const box = $('slotBox');
+  box.innerHTML = '<p class="loading">Menyemak slot kosong…</p>';
+  try {
+    const r = await api({ action: 'slots', tarikh });
+    if (tarikh !== pilih.tarikh) return; // pengguna dah tukar tarikh
+    if (!r.ok) throw new Error(r.msg);
+    const kosong = r.slots.filter(s => s.ada);
+    if (!r.slots.length || !kosong.length) {
+      box.innerHTML = '<p class="hint">' + (r.msg || 'Semua slot pada tarikh ini dah penuh. Sila pilih tarikh lain.') + '</p>';
+      return;
+    }
+    const grid = document.createElement('div'); grid.className = 'slots';
+    r.slots.forEach(s => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'slot'; b.textContent = s.masa;
+      b.disabled = !s.ada; b.setAttribute('aria-pressed','false');
+      b.setAttribute('aria-label', labelMasa(s.masa) + (s.ada ? '' : ', penuh'));
+      b.onclick = () => {
+        grid.querySelectorAll('.slot').forEach(x => x.setAttribute('aria-pressed','false'));
+        b.setAttribute('aria-pressed','true');
+        pilih.masa = s.masa; kemasRingkasan(); buka('s4');
+        $('s4').scrollIntoView({behavior:'smooth', block:'start'});
+      };
+      grid.appendChild(b);
+    });
+    box.innerHTML = ''; box.appendChild(grid);
+  } catch(e) {
+    box.innerHTML = '<p class="hint">Tak dapat semak slot. Cuba pilih tarikh sekali lagi.</p>';
+  }
+}
+
+function ringkasanHTML(){
+  return '<b>' + esc(pilih.servis || '-') + '</b>' + (pilih.harga ? ' · RM' + esc(pilih.harga) : '') +
+    '<br>' + (pilih.tarikh ? labelTarikh(pilih.tarikh) : '-') + (pilih.masa ? ' · ' + labelMasa(pilih.masa) : '');
+}
+function kemasRingkasan(){ $('summary').innerHTML = ringkasanHTML(); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* 4. Hantar tempahan */
+$('form').addEventListener('submit', async e => {
+  e.preventDefault(); hideErr();
+  const nama = $('nama').value.trim();
+  const telefon = $('telefon').value.trim();
+  if (!pilih.servis || !pilih.tarikh || !pilih.masa) return showErr('Sila lengkapkan servis, tarikh dan masa.');
+  if (!nama) { $('nama').focus(); return showErr('Sila isi nama anda.'); }
+  if (telefon.replace(/\D/g,'').length < 9) { $('telefon').focus(); return showErr('Nombor telefon nampak tak lengkap.'); }
+
+  const btn = $('btn'); btn.disabled = true; btn.textContent = 'Menghantar…';
+  try {
+    const r = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action:'tempah', servis:pilih.servis, tarikh:pilih.tarikh, masa:pilih.masa, nama, telefon, nota:$('nota').value.trim(), website:$('website').value })
+    }).then(x => x.json());
+
+    if (!r.ok) {
+      showErr(r.msg || 'Tempahan tak berjaya. Cuba sekali lagi.');
+      if ((r.msg || '').includes('diambil')) muatSlot(pilih.tarikh); // slot dah dirampas: segarkan senarai
+      btn.disabled = false; btn.textContent = 'Sahkan tempahan';
+      return;
+    }
+
+    $('doneSummary').innerHTML = ringkasanHTML() + '<br>Nama: ' + esc(nama) + (r.id ? '<br>ID tempahan: <b>' + esc(r.id) + '</b>' : '');
+    const teks = 'Salam, saya ' + nama + '. Saya dah tempah ' + pilih.servis + ' pada ' + labelTarikh(pilih.tarikh) + ', ' + labelMasa(pilih.masa) + '. ID: ' + (r.id || '-');
+    if (r.whatsapp) $('waBtn').href = 'https://wa.me/' + r.whatsapp + '?text=' + encodeURIComponent(teks);
+    else $('waBtn').style.display = 'none';
+    $('flow').style.display = 'none'; $('done').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch(err) {
+    showErr('Tak dapat dihantar. Semak internet dan cuba lagi.');
+    btn.disabled = false; btn.textContent = 'Sahkan tempahan';
+  }
+});
+
+mula();
+</script>
+</body>
+</html>
