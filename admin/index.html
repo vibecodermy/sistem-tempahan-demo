@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Admin Tempahan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2430; --muted:#5B6573; --line:#E2E6E4; --bg:#F6F7F6; --card:#FFFFFF;
+    --teal:#0F766E; --teal-soft:#E3F1EF; --gold:#F2B01E; --danger:#B42318;
+    --font:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 40px}
+  button{font:inherit;cursor:pointer}
+  button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+  /* Log masuk */
+  .login{max-width:340px;margin:12vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 20px;text-align:center}
+  .login h1{margin:0 0 4px;font-size:1.3rem}
+  .login p{margin:0 0 16px;color:var(--muted);font-size:.92rem}
+  .login input{width:100%;font:inherit;font-size:1.4rem;letter-spacing:.4em;text-align:center;padding:12px;border:1.5px solid #C9D0CD;border-radius:12px;margin-bottom:12px}
+  .btn{display:block;width:100%;font-weight:800;padding:13px;border:0;border-radius:12px;background:var(--ink);color:#fff}
+  .btn:disabled{opacity:.6;cursor:wait}
+  .err{color:var(--danger);font-size:.9rem;min-height:1.4em;margin-top:10px}
+
+  /* Kepala */
+  header{display:flex;justify-content:space-between;align-items:center;padding:22px 0 14px;gap:10px}
+  header small{display:block;font-size:.78rem;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.04em}
+  header h1{margin:2px 0 0;font-size:1.35rem;line-height:1.2}
+  .icon-btn{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-weight:600;font-size:.88rem;color:var(--ink)}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat b{display:block;font-size:1.4rem;font-weight:800;line-height:1.2}
+  .stat span{font-size:.78rem;color:var(--muted)}
+
+  .tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tab{white-space:nowrap;flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:.88rem;font-weight:600;color:var(--muted)}
+  .tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+
+  .day-h{font-size:.85rem;font-weight:800;color:var(--muted);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.03em}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:8px}
+  .card.batal{opacity:.55}
+  .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .time{font-size:1.15rem;font-weight:800}
+  .who{font-weight:600}
+  .meta{color:var(--muted);font-size:.9rem}
+  .note{background:var(--bg);border-radius:8px;padding:6px 10px;font-size:.88rem;margin-top:8px}
+  .pill{font-size:.75rem;font-weight:800;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .p-Baru{background:#FFF3D6;color:#8A5A00}
+  .p-Disahkan{background:#DCFCE7;color:#15803D}
+  .p-Selesai{background:#ECEEED;color:var(--muted)}
+  .p-Batal{background:#FDEDEC;color:var(--danger)}
+  .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+  .act{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;font-size:.84rem;font-weight:600;color:var(--ink)}
+  .act.ok{background:var(--teal);border-color:var(--teal);color:#fff}
+  .act.x{color:var(--danger)}
+  .act.wa{color:#15803D;text-decoration:none;display:inline-flex;align-items:center}
+  .act:disabled{opacity:.5;cursor:wait}
+
+  .empty{text-align:center;color:var(--muted);padding:40px 10px;background:var(--card);border:1px dashed var(--line);border-radius:14px}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- Log masuk -->
+<div class="wrap" id="loginView">
+  <div class="login">
+    <h1>Admin Tempahan</h1>
+    <p>Masukkan PIN admin</p>
+    <form id="loginForm">
+      <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" aria-label="PIN admin">
+      <button class="btn" id="loginBtn" type="submit">Masuk</button>
+    </form>
+    <div class="err" id="loginErr" role="alert"></div>
+  </div>
+</div>
+
+<!-- Papan pemuka -->
+<div class="wrap" id="appView" hidden>
+  <header>
+    <div><small>Admin</small><h1 id="kedai">Tempahan</h1></div>
+    <div style="display:flex;gap:6px">
+      <button class="icon-btn" id="refresh" type="button" aria-label="Muat semula">↻</button>
+      <button class="icon-btn" id="logout" type="button">Keluar</button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="stToday">0</b><span>Hari ini</span></div>
+    <div class="stat"><b id="stNew">0</b><span>Belum disahkan</span></div>
+    <div class="stat"><b id="stAll">0</b><span>Akan datang</span></div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-v="today" aria-selected="true">Hari ini</button>
+    <button class="tab" role="tab" data-v="upcoming" aria-selected="false">Akan datang</button>
+    <button class="tab" role="tab" data-v="new" aria-selected="false">Belum disahkan</button>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ====== TETAPAN ====== */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwRTig5Ey-kJtEqykWcuCtbOt8mRVGMIRr5pSNd3pZoXTcc6n4Lhi-gYl7D1TFYYBSskw/exec";
+/* ===================== */
+
+const HARI_PENUH = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+const BULAN = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+const $ = id => document.getElementById(id);
+
+let PIN = '';
+let DATA = [];
+let VIEW = 'today';
+
+function ymd(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+const HARI_INI = () => ymd(new Date());
+function labelTarikh(s){ const d = new Date(s + 'T12:00:00'); return (s === HARI_INI() ? 'Hari ini · ' : '') + HARI_PENUH[d.getDay()] + ', ' + d.getDate() + ' ' + BULAN[d.getMonth()]; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function toast(m){ const t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2200); }
+
+async function post(body){
+  const r = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body) });
+  return r.json();
+}
+
+/* Log masuk */
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const pin = $('pin').value.trim();
+  if (!pin) return;
+  $('loginBtn').disabled = true; $('loginErr').textContent = '';
+  const ok = await muat(pin);
+  $('loginBtn').disabled = false;
+  if (ok) {
+    PIN = pin;
+    try { sessionStorage.setItem('adminPin', pin); } catch(_) {}
+    $('loginView').hidden = true; $('appView').hidden = false;
+    muatNamaKedai();
+  }
+});
+
+$('logout').onclick = () => {
+  try { sessionStorage.removeItem('adminPin'); } catch(_) {}
+  location.reload();
+};
+
+async function muatNamaKedai(){
+  try {
+    const r = await fetch(GAS_URL + '?action=info').then(x => x.json());
+    if (r.ok) { $('kedai').textContent = r.kedai; document.title = 'Admin | ' + r.kedai; }
+  } catch(_) {}
+}
+
+/* Ambil senarai tempahan dari hari ini ke depan */
+async function muat(pin){
+  try {
+    const r = await post({ action:'admin_senarai', pin: pin || PIN, dari: HARI_INI() });
+    if (!r.ok) { $('loginErr').textContent = r.msg || 'Gagal.'; return false; }
+    DATA = r.tempahan;
+    lukis();
+    return true;
+  } catch(e) {
+    $('loginErr').textContent = 'Tak dapat sambung. Semak internet.';
+    return false;
+  }
+}
+
+/* Paparan */
+function lukis(){
+  const today = HARI_INI();
+  const aktif = DATA.filter(t => t.status !== 'Batal');
+  $('stToday').textContent = aktif.filter(t => t.tarikh === today).length;
+  $('stNew').textContent   = DATA.filter(t => t.status === 'Baru').length;
+  $('stAll').textContent   = aktif.length;
+
+  let rows = DATA;
+  if (VIEW === 'today') rows = DATA.filter(t => t.tarikh === today);
+  if (VIEW === 'new')   rows = DATA.filter(t => t.status === 'Baru');
+
+  const box = $('list');
+  if (!rows.length) {
+    box.innerHTML = '<div class="empty">' + (VIEW === 'today' ? 'Tiada tempahan hari ini.' : VIEW === 'new' ? 'Semua tempahan dah disahkan. 👍' : 'Tiada tempahan akan datang.') + '</div>';
+    return;
+  }
+
+  let html = '', hariLepas = '';
+  rows.forEach(t => {
+    if (t.tarikh !== hariLepas) { html += '<div class="day-h">' + labelTarikh(t.tarikh) + '</div>'; hariLepas = t.tarikh; }
+    const teksWA = 'Salam ' + t.nama + ', tempahan ' + t.servis + ' anda pada ' + labelTarikh(t.tarikh).replace('Hari ini · ','') + ', ' + t.masa + ' telah disahkan. Terima kasih!';
+    html +=
+      '<div class="card' + (t.status === 'Batal' ? ' batal' : '') + '">' +
+        '<div class="row1"><div><div class="time">' + esc(t.masa) + '</div>' +
+        '<div class="who">' + esc(t.nama) + '</div>' +
+        '<div class="meta">' + esc(t.servis) + ' · ' + esc(t.telefon) + '</div></div>' +
+        '<span class="pill p-' + esc(t.status) + '">' + esc(t.status) + '</span></div>' +
+        (t.nota ? '<div class="note">📝 ' + esc(t.nota) + '</div>' : '') +
+        '<div class="actions">' +
+          (t.status === 'Baru' ? '<button class="act ok" data-id="' + esc(t.id) + '" data-s="Disahkan">✓ Sahkan</button>' : '') +
+          (t.status === 'Disahkan' ? '<button class="act ok" data-id="' + esc(t.id) + '" data-s="Selesai">Tandakan selesai</button>' : '') +
+          (t.status === 'Baru' || t.status === 'Disahkan' ? '<button class="act x" data-id="' + esc(t.id) + '" data-s="Batal">Batal</button>' : '') +
+          (t.status === 'Batal' || t.status === 'Selesai' ? '<button class="act" data-id="' + esc(t.id) + '" data-s="Baru">Buka semula</button>' : '') +
+          '<a class="act wa" target="_blank" rel="noopener" href="https://wa.me/' + esc(t.telefon) + '?text=' + encodeURIComponent(teksWA) + '">WhatsApp</a>' +
+        '</div>' +
+      '</div>';
+  });
+  box.innerHTML = html;
+}
+
+/* Tukar status */
+$('list').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-id]');
+  if (!b) return;
+  const id = b.dataset.id, status = b.dataset.s;
+  if (status === 'Batal' && !confirm('Batalkan tempahan ini? Slot akan dibuka semula untuk pelanggan lain.')) return;
+  b.disabled = true;
+  try {
+    const r = await post({ action:'admin_status', pin: PIN, id, status });
+    if (!r.ok) { toast(r.msg || 'Gagal kemas kini.'); b.disabled = false; return; }
+    const t = DATA.find(x => x.id === id); if (t) t.status = status;
+    lukis(); toast('Status: ' + status);
+  } catch(_) { toast('Tak dapat sambung.'); b.disabled = false; }
+});
+
+/* Tab */
+document.querySelectorAll('.tab').forEach(tab => tab.onclick = () => {
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected','false'));
+  tab.setAttribute('aria-selected','true');
+  VIEW = tab.dataset.v; lukis();
+});
+
+$('refresh').onclick = async () => { $('refresh').disabled = true; await muat(); $('refresh').disabled = false; toast('Dikemas kini'); };
+
+// Muat semula automatik setiap 60 saat bila page sedang dibuka
+setInterval(() => { if (PIN && !document.hidden) muat(); }, 60000);
+
+// Log masuk semula automatik dalam sesi yang sama
+(async () => {
+  let saved = '';
+  try { saved = sessionStorage.getItem('adminPin') || ''; } catch(_) {}
+  if (saved && await muat(saved)) {
+    PIN = saved; $('loginView').hidden = true; $('appView').hidden = false; muatNamaKedai();
+  }
+})();
+</script>
+</body>
+</html>
